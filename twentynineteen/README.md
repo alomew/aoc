@@ -1,19 +1,12 @@
-# Advent of Code 2019
+# 2019
 
-This year I am going to try to use Dart, so as to hopefully familiarise myself enough that
-trying to learn Flutter isn't *too* much of an issue.
+This year will be done using Elm. I initially thought I'd try out Dart, but I reckon I'll be more likely to go further if I use a language I'm more familiar
+with the idioms for.
 
 ## File Structure
 
-To see a kinda pretty output for each day use `bin/main.dart`. The functionality for each day is found in the appropriate
-`lib/day[i].dart`.
+The output of each day and part is displayed to me by `src/Main.elm`. Each day's functionality is written in `src/Day[i]`.
 
 ## Day 1
 
-This was a relatively straightforward day. It was mostly getting used to reading files in Dart; using async a little bit;
-fiddling around with iterators vs lists.
-
-## Template Info
-
-Created from templates made available by Stagehand under a BSD-style
-[license](https://github.com/dart-lang/stagehand/blob/master/LICENSE).
+The first part is a simple map and sum. The second is slightly more involved -- we have to handcook a recursive function, which we make tail-recursive just to be safe.

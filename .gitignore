@@ -3,3 +3,4 @@ stale_*
 */stale_*
 */.gitignore
 .idea
+*/.idea
