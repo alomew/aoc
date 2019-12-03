@@ -3,12 +3,14 @@ module Main exposing (..)
 import Browser
 import Day1
 import Day2
-import Html exposing (div, h1, h2, text)
+import Day3
+import Html exposing (Html, div, h1, h2, text)
 
 
 init =
-    [ ( Day1.part1, Day1.part2 )
-    , ( Day2.part1, Day2.part2 )
+    [ ( Just Day1.part1, Just Day1.part2 )
+    , ( Just Day2.part1, Just Day2.part2 )
+    , ( Day3.part1, Nothing )
     ]
 
 
@@ -17,21 +19,27 @@ main =
 
 
 type alias Model =
-    List ( Int, Int )
+    List ( Maybe Int, Maybe Int )
 
 
 update _ model =
     model
 
 
+textOfPart : Maybe Int -> String
+textOfPart mi =
+    Maybe.map String.fromInt mi |> Maybe.withDefault "That went very wrong."
+
+
 viewDay day ( p1, p2 ) =
     div []
         [ h2 [] [ text <| "Day " ++ String.fromInt day ]
-        , div [] [ text ("Part 1: " ++ String.fromInt p1) ]
-        , div [] [ text ("Part 2: " ++ String.fromInt p2) ]
+        , div [] [ text ("Part 1: " ++ textOfPart p1) ]
+        , div [] [ text ("Part 2: " ++ textOfPart p2) ]
         ]
 
 
+view : Model -> Html msg
 view model =
     div []
         ([ h1 [] [ text "Advent of Code, 2019" ] ]
