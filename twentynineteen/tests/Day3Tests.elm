@@ -1,7 +1,7 @@
 module Day3Tests exposing (suite)
 
 import Array
-import Day3 exposing (Direction(..), WireStrand, crossoverPoints, parseWire)
+import Day3 exposing (Direction(..), WireStrand, crossoverPoints, parseWire, shortestCombinedSteps)
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Set
@@ -37,5 +37,13 @@ suite =
 
                         Nothing ->
                             Expect.fail "Couldn't parse the wires"
+            ]
+        , describe
+            "Shortest joint steps"
+            [ test "Example given" <|
+                \_ ->
+                    Expect.equal
+                        (Just <| Just 30)
+                        (Maybe.map2 shortestCombinedSteps (parseWire "R8,U5,L5,D3") (parseWire "U7,R6,D4,L4"))
             ]
         ]

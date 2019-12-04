@@ -10,7 +10,7 @@ import Html exposing (Html, div, h1, h2, text)
 init =
     [ ( Just Day1.part1, Just Day1.part2 )
     , ( Just Day2.part1, Just Day2.part2 )
-    , ( Day3.part1, Nothing )
+    , ( Nothing, Day3.part2 )
     ]
 
 

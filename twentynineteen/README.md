@@ -26,3 +26,11 @@ by generating an intcode program, finding the output, and then asking `findNounV
 to give us the noun and verb already in the program. (Of course we could purposefully
 spoil these places if we mistrusted the implementer.) If I had needed more test cases,
 or if it hadn't been 23:54, I might have done this.
+
+## Day 3
+
+This day was an interesting one -- our code is being tested for efficiency: I saw an "a process is holding up this website" message.
+
+The second part was particularly interesting in that it asked a question of you -- do you rewrite everything you have or do you write new functionality around the old stuff? My approach wasn't that great -- I am pretty sure I slowed down both parts with my changes.
+
+Perhaps tomorrow it will be time to return to Dart, and see if I can figure out some of the cool iterator stuff that is likely to come very handy, or the getting around Maybes, which is convoluting half of my code.

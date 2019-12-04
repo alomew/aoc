@@ -1,6 +1,7 @@
 module Day3 exposing (..)
 
 import Common exposing (Point2D)
+import Dict exposing (Dict)
 import Inputs.Day3 exposing (inputStrings)
 import List.Extra as List
 import Parser as Prs exposing ((|=), Parser)
@@ -50,10 +51,10 @@ parseWire s =
         |> Common.losslessMap (\wss -> Prs.run parseWireStrand wss |> Result.toMaybe)
 
 
-pointsOverStrand : Point2D -> WireStrand -> ( Set Point2D, Point2D )
+pointsOverStrand : Point2D -> WireStrand -> ( List Point2D, Point2D )
 pointsOverStrand ( startX, startY ) { direction, length } =
     let
-        orderedPoints =
+        strandOrderedPoints =
             List.range 1 length
                 |> List.map
                     (\i ->
@@ -71,11 +72,11 @@ pointsOverStrand ( startX, startY ) { direction, length } =
                                 ( startX + i, startY )
                     )
     in
-    ( Set.fromList orderedPoints, Maybe.withDefault ( 0, 0 ) <| List.last orderedPoints )
+    ( strandOrderedPoints, Maybe.withDefault ( startX, startY ) <| List.last strandOrderedPoints )
 
 
-allPoints : Wire -> Set Point2D
-allPoints wire =
+orderedPoints : Wire -> List Point2D
+orderedPoints wire =
     List.foldl
         (\strand { currentPlace, points } ->
             let
@@ -83,12 +84,17 @@ allPoints wire =
                     pointsOverStrand currentPlace strand
             in
             { currentPlace = lastPoint
-            , points = Set.union strandPoints points
+            , points = points ++ strandPoints
             }
         )
-        { currentPlace = ( 0, 0 ), points = Set.empty }
+        { currentPlace = ( 0, 0 ), points = [] }
         wire
         |> .points
+
+
+allPoints : Wire -> Set Point2D
+allPoints wire =
+    Set.fromList <| orderedPoints wire
 
 
 crossoverPoints : Wire -> Wire -> Set Point2D
@@ -109,6 +115,55 @@ part1 =
                         |> Set.toList
                         |> List.map (Common.manhattanDistance ( 0, 0 ))
                         |> List.minimum
+
+        _ ->
+            Nothing
+
+
+fewestSteps : Wire -> Set Point2D -> Dict Point2D Int
+fewestSteps wire wanted =
+    List.indexedFoldl
+        (\i p d ->
+            if Set.member p wanted then
+                Common.weakDictInsert p (i + 1) d
+
+            else
+                d
+        )
+        Dict.empty
+        (orderedPoints wire)
+
+
+shortestCombinedSteps : Wire -> Wire -> Maybe Int
+shortestCombinedSteps wire1 wire2 =
+    let
+        crossovers =
+            crossoverPoints wire1 wire2
+
+        fewestSteps1 =
+            fewestSteps wire1 crossovers
+
+        fewestSteps2 =
+            fewestSteps wire2 crossovers
+    in
+    Common.losslessMap (\point -> Maybe.map2 (+) (Dict.get point fewestSteps1) (Dict.get point fewestSteps2))
+        (Set.toList <| crossovers)
+        |> Maybe.andThen List.minimum
+
+
+part2 : Maybe Int
+part2 =
+    case inputStrings of
+        [ wireString1, wireString2 ] ->
+            parseWire wireString1
+                |> Maybe.andThen
+                    (\wire1 ->
+                        parseWire wireString2
+                            |> Maybe.andThen
+                                (\wire2 ->
+                                    shortestCombinedSteps wire1 wire2
+                                )
+                    )
 
         _ ->
             Nothing
