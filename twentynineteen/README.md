@@ -34,3 +34,13 @@ This day was an interesting one -- our code is being tested for efficiency: I sa
 The second part was particularly interesting in that it asked a question of you -- do you rewrite everything you have or do you write new functionality around the old stuff? My approach wasn't that great -- I am pretty sure I slowed down both parts with my changes.
 
 Perhaps tomorrow it will be time to return to Dart, and see if I can figure out some of the cool iterator stuff that is likely to come very handy, or the getting around Maybes, which is convoluting half of my code.
+
+## Day 4
+
+A strange day this was -- the naive solution seems perfectly reasonable. And any improvement over it seems far too 
+complex to warrant considering. Combinatorics will have to wait.
+My initial attempt at part 2 was rather cumbersome; and the benefit of the second attempt, which makes use of the 
+almost indispensable `List.Extra` module, is that you could leverage parallel computing.
+
+However, we do start to worry that Elm is not performant enough to deal with more demanding tasks. Yes, the abstraction
+is there, but the answer page is taking a couple of seconds to show.
