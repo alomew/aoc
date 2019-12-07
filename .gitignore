@@ -1,7 +1,8 @@
-*/elm-stuff
 stale_*
 */stale_*
 */.gitignore
 .idea
 */.idea
 dart2019/
+scala2019/
+twentynineteen/purescript/
