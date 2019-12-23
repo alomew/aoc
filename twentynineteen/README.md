@@ -27,6 +27,9 @@ to give us the noun and verb already in the program. (Of course we could purpose
 spoil these places if we mistrusted the implementer.) If I had needed more test cases,
 or if it hadn't been 23:54, I might have done this.
 
+EDIT 23DEC19: Actually the generation of an intcode program is non-trivial -- you have to guarantee that positional pointers
+actually point to valid positions.
+
 ## Day 3
 
 This day was an interesting one -- our code is being tested for efficiency: I saw an "a process is holding up this website" message.
@@ -40,7 +43,17 @@ Perhaps tomorrow it will be time to return to Dart, and see if I can figure out 
 A strange day this was -- the naive solution seems perfectly reasonable. And any improvement over it seems far too 
 complex to warrant considering. Combinatorics will have to wait.
 My initial attempt at part 2 was rather cumbersome; and the benefit of the second attempt, which makes use of the 
-almost indispensable `List.Extra` module, is that you could leverage parallel computing.
+almost indispensable `List.Extra` module, is that you could read it in French and still understand it.
 
-However, we do start to worry that Elm is not performant enough to deal with more demanding tasks. Yes, the abstraction
-is there, but the answer page is taking a couple of seconds to show.
+## Day 5
+
+Focusing again on the intcode computer, we pull out a separate module (you can tell we will be coming back to this), and hodgepodge together an interpreter properly, with variants for different instructions and string parsers to translate the ints in the given intcode.
+
+I also decided to use the Elm REPL, rather than a barebones HTML page, to give me the final answers, because 
+it is much faster.
+
+## Day 6
+
+This problem concerns a tree (with no obvious cute properties). I rushed to represent the orbital relations with a recursive variant type (as you might a BST) but this actually did not help to solve either part. They are both really quite messy. The worst offence is the parsing of the input -- we receive the orbital pairs in arbitary order, so we have to search the whole tree for every pair as we insert it.
+
+Despite this implementation issue, I enjoyed the set theory employed to finish part 2.
