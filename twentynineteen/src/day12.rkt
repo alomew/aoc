@@ -54,10 +54,15 @@
             ([_ (in-range n)])
     (time-step moons-now)))
 
-(define energy
-  (match-lambda [(moon (vec3 x y z) (vec3 dx dy dz))
-                 (* (+ (abs x) (abs y) (abs z))
-                    (+ (abs dx) (abs dy) (abs dz)))]))
+(define/match (potential-energy m)
+  (((moon (vec3 x y z) _))
+   (apply + (map abs (list x y z)))))
+
+(define/match (kinetic-energy m)
+  (((moon _ (vec3 dx dy dz)))
+   (apply + (map abs (list dx dy dz)))))
+
+(define (energy m) (* (potential-energy m) (kinetic-energy m)))
 
 (define (parse-moons p)
   (for/list ([coord (in-lines p)])
