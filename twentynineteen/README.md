@@ -58,6 +58,27 @@ This problem concerns a tree (with no obvious cute properties). I rushed to repr
 
 Despite this implementation issue, I enjoyed the set theory employed to finish part 2.
 
+## Day 10
+
+For the first part, we capture the ray on which every asteroid finds itself.
+Then the asteroid we are searching for is the one which permits the most
+inhabited rays.
+
+For the second part, we call the special asteroid the *source*.
+We construct -- relative to the source --
+the displacements of all the asteroids, grouped by which ray emanating
+from the source they lie on, sorted with first being closest to the source,
+last being farthest.
+We then cycle around, removing the heads of these lists.
+The order of the cycle is clockwise: to determine this order we use the
+`atan2` function, which in Racket is an overload on `atan`.
+This cycle must also begin with the ray pointing straight up,
+and I accomplished this with a transformation on the result of `atan`
+such that -π points directly up (and π is excluded): for in that case,
+the least angle is the one
+we wish to start with.
+This method, however, is unlikely to scale, since you would be relying
+on ever precise floating point numbers.
 
 ## Day 12
 
