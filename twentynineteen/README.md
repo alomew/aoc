@@ -121,3 +121,154 @@ assumes it, so I am happy to as well for the time being.
 The solution, then, is to find the cycle times in each dimension,
 and notice that we will return to the initial state at every multiple
 of these times. The lowest common multiple is thus our solution.
+
+## Day 14
+
+This is quite a nice problem of resource management.
+
+My solution depends on three points of interest: structure,
+modular arithmetic, and search.
+
+We must understand the structure of the dependencies formed by
+our given list of transmutations. Though it should be said that I make more
+assumptions on this structure
+in my solution than are outright stated in the problem.
+
+We have an acyclic, directed graph where the nodes are recipes
+that point to the recipes of all its ingredients
+(unless the only ingredient is `ORE`, in which case there are no outgoing edges).
+(Note this structure
+does not relate to quantities anywhere).
+
+We now show that it is acyclic:
+We take as given that
+every substance except `ORE` has a single method of production,
+and everything except `ORE` can be made.
+So a general cycle would be like:
+producing `A` requires having `B`;
+producing `B` requires having `C`;
+...;
+producing `G` requires having `A`.
+But then we cannot ever produce `A` -- a contradiction.
+
+Every substance having a single method of production
+means that if ever we ask a recipe to be made,
+there is a single, determined way to find further dependencies:
+follow all departing edges until you reach recipes
+taking only `ORE`.
+
+I model the actual question -- of how much ore is needed --
+by asking how much of its product each recipe needs to produce.
+As is often the case with graphs, it is by a recursive function acting
+in the presence of limited mutable state.
+That state is where we keep track of how many times
+a certain substance has been asked for.
+(So, if a recipe produces 7 `F`s and we have stored the number 10 next to it,
+we mean that we have required 10 `F`s -- not 70).
+
+The flow is like this. Ask for `q`-many `X`s. Update the register to
+say that we need `q`-many `X`s. We now ask how many times the recipe must be
+made. For instance the recipe might be for (`q`-1)-many `X`s and will thus
+need to be made twice in order to produce *at least* `q`-many `X`s.
+We then ask each ingredient in that recipe be produced as many times as needed:
+i.e., as many times as required in one recipe multiplied by the
+number of recipes required.
+This continues.
+Whenever we encounter a recipe used before,
+we update the register by adding the new quantity required
+to the amount stored for that recipe.
+We then request ingredients only if we need (a) new batch(es) of the product.
+For instance, if we have made two batches of 6 `F`s because we previously needed
+7 of them, then asking for 3 more will not trigger a new production,
+because we have 5 left over from the previous two batches.
+However, asking for *another* 3 on top of that *will* trigger a new batch.
+
+So, in short, we are traversing the graph, prompted by our register.
+
+Once this process finishes, we are left to calculate the amount of `ORE`
+required.
+We check only the recipes in the register who has `ORE` for an ingredient
+(indeed we observe that whenever `ORE` in *an* ingredient
+it is *the only* ingredient, even though it is not formally guaranteed).
+Then we check how many times we would have to call the recipe
+(round up a division) and how many `ORE` each recipe requires.
+
+This latter calculation is quite straightforward, but it is
+effectively a nice version of the calculation
+you have to make when choosing how many
+new batches of some intermediate substance you need.
+It is nice because it is final -- it knows the waste it incurs
+is required.
+You cannot apply this calculation to the intermediary substances
+without incurring an unnecessary waste.
+
+We notice that a batch should be produced any time its required-tally
+exceeds a multiple of the quantity produced. So if I ask for 1 `F` and
+its recipe produces a batch of 6, we make a batch since `1 > 0 * 6`.
+If I ask for 24 `G` in batches of 5, we make five batches since
+``` text
+24 > 0 * 5
+24 > 1 * 5
+24 > 2 * 5
+24 > 3 * 5
+24 > 4 * 5
+```
+Now if we ask for 1 more `G`, we need no more batches, since in five batches
+we have made 25 `G`s already.
+But if we ask for 2, then we need another, since `26 > 5 * 5`.
+
+So the question we are in fact answering is how many times in a certain range --
+if we have already required `p`-many of a substance and now ask for `q` more,
+our range is `[p + 1, ..., p + q]`, integers --
+we find a number `m` s.t. `m = 1 (mod b)`, where `b` is the batch size.
+This is, by the way, equivalent to finding multiples of `b` in the range
+`[p, ..., p + q - 1]`. The solution is left to the reader, but my version
+can be found in code form as `zero-congs`.
+
+The second part is interesting, and falls (after an additional assumption)
+into a nice category of problems --
+search problems.
+It is trivial to extend part 1 to find the `ORE` required to
+make `n` `FUEL`. Not by multiplying, of course, because you are then wasting
+leftover intermediary resources.
+Recall that to start the chain of requests for 1 `FUEL`, you
+have to ask for a certain quantity of it (since the function is also called
+when asking for certain quantities of other recipes):
+we just expose this choice.
+
+We make a new assumption: the process of producing `FUEL` is expensive in `ORE`.
+This needn't hold. Suppose the following list of reactions:
+``` text
+10 ORE => 1 A
+1 A => 4000 C
+1 C => 1 FUEL
+```
+Here, we see that with 10 `ORE` I could produce 4000 `FUEL`.
+But to constrain our
+search space, we suppose that the amount of `FUEL`
+we can produce is less than
+`ORE` we consume.
+
+Now, we can binary search over the set of possible `FUEL` yields:
+`[0, ..., MAX-ORE]`.
+
+However, we can see without any new assumptions that
+the function `ore-needed` -- taking a number of `FUEL` to the number
+of `ORE` required to produce that much `FUEL` -- is monotone increasing:
+more `FUEL` requires at least as many `ORE`;
+less `FUEL` requires at most as many `ORE`.
+
+These are the conditions required for this binary search.
+
+At each stage we either
+* exclude numbers below an attainable bound.
+  (for instance, if you know that we have enough `ORE` for 10 `FUEL`,
+  ignore 0-9)
+* exclude numbers above and including an unattainable bound.
+  (if you don't have enough `ORE` to make 9 `FUEL`, ignore 0-9)
+(Enough `ORE` is assessed by using `extended-part-1` to find out
+how much `ORE` would be required to make `n` `FUEL` and asking
+whether we have at least as much `ORE` available -- exactly as you
+would expect).
+
+This pruning eventually gives the maximum fuel we can produce.
