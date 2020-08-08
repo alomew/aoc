@@ -262,10 +262,13 @@ These are the conditions required for this binary search.
 
 At each stage we either
 * exclude numbers below an attainable bound.
-  (for instance, if you know that we have enough `ORE` for 10 `FUEL`,
+  
+  (if you have enough `ORE` for 10 `FUEL`,
   ignore 0-9)
 * exclude numbers above and including an unattainable bound.
+  
   (if you don't have enough `ORE` to make 9 `FUEL`, ignore 0-9)
+
 (Enough `ORE` is assessed by using `extended-part-1` to find out
 how much `ORE` would be required to make `n` `FUEL` and asking
 whether we have at least as much `ORE` available -- exactly as you
