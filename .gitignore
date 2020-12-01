@@ -5,4 +5,7 @@ stale_*
 */.idea
 dart2019/
 scala2019/
-
+clojure2019/
+ruby19/
+**.secret
+**.input
