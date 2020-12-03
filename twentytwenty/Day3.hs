@@ -1,12 +1,11 @@
 module Day3 where
 
+import AOC
+
 data Terrain = Terrain [String] Int Int
 
-toyData :: Terrain
-toyData = terrain "..##.......\n#...#...#..\n.#....#..#.\n..#.#...#.#\n.#...##..#.\n..#.##.....\n.#.#.#....#\n.#........#\n#.##...#...\n#...##....#\n.#..#...#.#"
-
-realData :: IO Terrain
-realData = terrain <$> readFile "day3.input"
+toyData :: String
+toyData = "..##.......\n#...#...#..\n.#....#..#.\n..#.#...#.#\n.#...##..#.\n..#.##.....\n.#.#.#....#\n.#........#\n#.##...#...\n#...##....#\n.#..#...#.#"
 
 terrain :: String -> Terrain
 terrain s = Terrain (lines s) (length . head $ ls) (length ls)
@@ -28,9 +27,11 @@ part2 :: Terrain -> Int
 part2 t = product $ map (uncurry $ trees t) [(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)]
 
 main :: IO ()
-main = do
-  ns <- realData
-  putStr "Part 1: "
-  print $ part1 ns
-  putStr "Part 2: "
-  print $ part2 ns
+main =
+  mainAOC 3 terrain $
+    def
+      & toys .~ [Toy toyData (Just 7) (Just 336)]
+      & part1F .~ part1
+      & part2F .~ part2
+      & part1Ans ?~ 205
+      & part2Ans ?~ 3952146825

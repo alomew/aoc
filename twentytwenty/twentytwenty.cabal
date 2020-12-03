@@ -15,15 +15,18 @@ maintainer:          alomew@gmail.com
 -- copyright:
 -- category:
 build-type:          Simple
-extra-source-files:  Day1.hs
+extra-source-files:  AOC.hs
+                   , Day1.hs
                    , Day2.hs
                    , Day3.hs
 
 executable twentytwenty
   main-is:             Main.hs
-  other-modules:       Day1, Day2, Day3
+  other-modules:       AOC, Day1, Day2, Day3
   -- other-extensions:
   build-depends:       base >=4.13 && <4.14
                      , parsec
+                     , lens
+                     , data-default
   -- hs-source-dirs:
   default-language:    Haskell2010
