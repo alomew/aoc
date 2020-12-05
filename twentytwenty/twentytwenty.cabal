@@ -19,14 +19,18 @@ extra-source-files:  AOC.hs
                    , Day1.hs
                    , Day2.hs
                    , Day3.hs
+                   , Day4.hs
 
 executable twentytwenty
   main-is:             Main.hs
-  other-modules:       AOC, Day1, Day2, Day3
+  other-modules:       AOC, Day1, Day2, Day3, Day4
   -- other-extensions:
   build-depends:       base >=4.13 && <4.14
                      , parsec
                      , lens
                      , data-default
+                     , containers
+                     , split
+                     , hspec
   -- hs-source-dirs:
   default-language:    Haskell2010

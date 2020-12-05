@@ -30,8 +30,7 @@ main :: IO ()
 main =
   mainAOC 3 terrain $
     def
-      & toys .~ [Toy toyData (Just 7) (Just 336)]
-      & part1F .~ part1
-      & part2F .~ part2
+      & part1F ?~ part1
+      & part2F ?~ part2
       & part1Ans ?~ 205
       & part2Ans ?~ 3952146825
