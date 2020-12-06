@@ -262,11 +262,11 @@ These are the conditions required for this binary search.
 
 At each stage we either
 * exclude numbers below an attainable bound.
-  
+
   (if you have enough `ORE` for 10 `FUEL`,
   ignore 0-9)
 * exclude numbers above and including an unattainable bound.
-  
+
   (if you don't have enough `ORE` to make 9 `FUEL`, ignore 0-9)
 
 (Enough `ORE` is assessed by using `extended-part-1` to find out
@@ -275,3 +275,153 @@ whether we have at least as much `ORE` available -- exactly as you
 would expect).
 
 This pruning eventually gives the maximum fuel we can produce.
+
+
+## Day 16
+
+This problem set concerns itself with a peculiar signal-cleaner.
+
+Through multiple phases, a series of patterns are dot-multiplied
+with some code and are reduced to their final digit
+to produce one element of the successive one.
+
+To imitate this process, we use one of Racket's `for` comprehensions.
+
+The only real point of interest with respect to the problem is how
+the patterns are generated and applied.
+
+In the problem spec, the pattern is defined as:
+calling the first element `e_1` and the rest `e_i`, then the pattern applied
+to produce the next `i`th element `f_i`
+should be `i`-many of each in `[0, 1, 0, -1]` repeated,
+but with the first
+`0` dropped.
+This is then dot-multiplied with our signal (and then only the final
+digit taken)
+to give the `i`th element
+of the new signal.
+
+To simulate this, we can dot-multiply the `i`-repeated pattern
+`[1, 0, -1, 0]` with all-but-the-first-(`i - 1`) elements in the signal.
+
+### Part 2
+
+Unfortunately, we couldn't drop into anything like
+matrix reasoning in the first part, because there is no
+matrix to represent the "leave only the final digit" rule.
+If the numbers were all positive, we could use modular arithmetic,
+but because negative elements are possible, we can't.
+
+However, we can make some observations that allow us to use it in part 2.
+
+Each phase (without dropping to single digits) can be represented
+as matrix multiplication. For example, a phase on `123123` looks like:
+
+``` text
++--                --+  +- -+
+|  1  0 -1  0  1  0  |  | 1 |
+|  0  1  1  0  0 -1  |  | 2 |
+|  0  0  1  1  1  0  |  | 3 |
+|  0  0  0  1  1  1  |  | 1 |
+|  0  0  0  0  1  1  |  | 2 |
+|  0  0  0  0  0  1  |  | 3 |
++--                --+  +- -+
+```
+
+Where each row of the matrix is each pattern that ends up being applied.
+The key observation here is that the second half of the next code
+is independent of the first half of the previous: the first three entries
+in the last three rows are all 0. And: if we for any `k <= 3` take the
+last `k`-many elements of the code, then they are independent of all
+before it since: for any such collection of bottom rows,
+the effective matrix
+is the upper-triangle-ones matrix.
+
+Taking the last three rows:
+
+``` text
++--       --+  +- -+
+|  1  1  1  |  | 1 |
+|  0  1  1  |  | 2 |
+|  0  0  1  |  | 3 |
++--       --+  +- -+
+```
+and taking the last two:
+
+``` text
++--    --+  +- -+
+|  1  1  |  | 2 |
+|  0  1  |  | 3 |
++--    --+  +- -+
+```
+
+To prove we get this effect for any row deeper than `m/2` -- `m`
+being number of rows:
+Say `i` is a row in question, and `i > m/2 <=> i >= m/2 + 1` (since `i` an integer).
+Then our pattern
+begins with `i - 1` zeroes, followed by `i` ones. Then since we have a
+square matrix, that row must be `m`-long. And we have accounted already for
+the first `(i - 1) + i = 2i - 1` elements in it. But since `i >= m/2 + 1`,
+we have accounted for `2i - 1 >= m + 1 >= m` elements.
+So we have the whole row.
+
+In the context of our problem, then, provided we are pointed
+beyond half-way through our code for our special 8 digits,
+we can completely drop all prior elements of our signal,
+and forget the original patterns to consider only these ones of so-many zeroes,
+then so-many ones.
+
+Now, since we no longer have any negative numbers to worry about,
+we can actually consider successive phases as repeated matrix multiplication,
+because dropping down to the last digit is just reducing mod 10,
+rather than reducing the absolute value mod 10.
+Reducing mod 10 is independent to adding and multiplying,
+and can therefore occur at any point during matrix multiplication.
+So, `k` phases now means evaluating `M^k * s`, where `M` is the appropriate
+upper-triangle-ones matrix, and `s` is the original signal.
+
+It turns out that `M^k` is a matrix
+whose first row is the `k`th (counting from 1) row in the [symmetric pascal matrix](https://en.wikipedia.org/wiki/Pascal_matrix)
+and subsequent rows are the right-shifts of the previous with leading zeros.
+
+E.g. `M^3 (3 x 3)`
+
+``` text
++--   --+
+| 1 3 6 |
+| 0 1 3 |
+| 0 0 1 |
++--   --+
+```
+
+Now, we just need to memoize the first row of `M^100` -- in the dimensions
+of our problem --
+in order to have a fairly smooth trip of calculating each of our special 8 elements.
+
+There is a binomial formula for calculating arbitrary elements of Pascal's matrix.
+Ordinarily, this would be very time consuming, but because we actually
+need these elements *mod 10* we can speed things up with [Lucas's Theorem](https://en.wikipedia.org/wiki/Lucas%27s_theorem)
+and the [Chinese Remainder Theorem](https://en.wikipedia.org/wiki/Chinese_remainder_theorem).
+By Lucas's, we can find the binomials we need mod 5 and 2, and then use the Chinese
+Remainder theorem to recover them mod 10.
+
+Also in my solution file is a more straightforward solution,
+that iterates the process, and uses a `scan` (list of intermediary
+results of a `fold`) to work backwards from the end.
+This is useful since if we recall our matrix structure:
+
+``` text
++--       --+  +- -+
+|  1  1  1  |  | 1 |
+|  0  1  1  |  | 2 |
+|  0  0  1  |  | 3 |
++--       --+  +- -+
+```
+
+The last element of the resulting sequence is `3`, the second is `2 + 3`,
+and the first is `1 + 2 + 3`. So it makes sense to use the previous result --
+starting from the end -- and just add the next-along (towards the beginning) element of the input signal each time
+we want the next-along element of the output signal.
+
+The binomial solution takes ~half the time -- likely because it doesn't
+need to build quite so many lists.
