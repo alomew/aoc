@@ -1,9 +1,10 @@
 {-# LANGUAGE TemplateHaskell #-}
 
-module AOC (module Control.Lens, module Data.Default, module AOC) where
+module AOC (module Control.Lens, module Data.Default, module Test.Hspec, module AOC) where
 
 import Control.Lens
 import Data.Default
+import Test.Hspec
 import Text.Printf
 
 -- TIP: ?~ for setting the maybe values

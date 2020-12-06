@@ -2,60 +2,52 @@ module Day5 where
 
 import AOC
 import qualified Data.Set as S
-import Test.Hspec
 import Text.Printf
 
 binString ::
-  -- | zeroChar
-  Char ->
-  -- | oneChar
-  Char ->
+  -- | zeroChars
+  [Char] ->
+  -- | oneChars
+  [Char] ->
   -- | encoded binary number
   String ->
   Int
-binString z o = decomp . reverse
+binString zs os = decomp . reverse
   where
     decomp :: String -> Int
     decomp = ifoldl (\i n c -> 2 ^ i * f c + n) 0
     f c
-      | c == z = 0
-      | c == o = 1
-      | otherwise = error (printf "looking for %c and %c: found %c" z o c)
-
-parseRow = binString 'F' 'B'
-
-parseCol = binString 'L' 'R'
-
-parseSeat :: String -> (Int, Int)
-parseSeat s = (parseRow r, parseCol c)
-  where
-    (r, c) = splitAt 7 s
+      | c `elem` zs = 0
+      | c `elem` os = 1
+      | otherwise = error (printf "valid chars are %v: found %c" (zs ++ os) c)
 
 seatId :: String -> Int
-seatId s = r * 8 + c
-  where
-    (r, c) = parseSeat s
+seatId = binString ['F', 'L'] ['B', 'R']
+
+minMax :: [Int] -> (Int, Int)
+minMax xs = (minimum, maximum) & both %~ ($ xs)
 
 part1 :: [String] -> Int
-part1 = maximum . map seatId
+part1 = snd . minMax . map seatId
 
 part2 :: [String] -> Int
-part2 xs = head . dropWhile (`S.member` occupied) . dropWhile (`S.notMember` occupied) $ [0 ..]
+part2 xs = total - sum ids
   where
-    occupied :: S.Set Int
-    occupied = S.fromList $ map seatId xs
+    ids = map seatId xs
+    (mn, mx) = minMax $ map seatId xs
+    total = (mx - mn + 1) * ((mn + mx) `quot` 2)
 
 main = do
   realData <- lines <$> readFile "day5.input"
   hspec $ do
     describe "binString" $ do
       it "row example" $ do
-        parseRow "FBFBBFF" `shouldBe` 44
+        seatId "FBFBBFF" `shouldBe` 44
       it "col example" $ do
-        parseCol "RLR" `shouldBe` 5
+        seatId "RLR" `shouldBe` 5
     describe "full seat" $ do
       it "example" $ do
-        parseSeat "FBFBBFFRLR" `shouldBe` (44, 5)
+        seatId "FBFBBFFRLR" `shouldBe` 44 * 8 + 5
 
     describe "part1" $ do
       it "example 1" $ part1 ["BFFFBBFRRR"] `shouldBe` 567
