@@ -47,3 +47,8 @@ count f = foldl (\c x -> if f x then c + 1 else c) 0
 rightToMaybe :: Either b a -> Maybe a
 rightToMaybe (Right x) = Just x
 rightToMaybe (Left _) = Nothing
+
+-- | a function that reads and returns the contents of "copybin.txt"
+-- | used to insert toy data into a file
+-- | (intended for use in GHCi)
+readCopyBin = readFile "copybin.txt"
