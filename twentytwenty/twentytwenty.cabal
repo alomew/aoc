@@ -24,11 +24,12 @@ extra-source-files:  AOC.hs
                    , Day6.hs
                    , Day7.hs
                    , Day8.hs
+                   , Day9.hs 
 
 executable twentytwenty
   main-is:             Main.hs
   other-modules:       AOC, Day1, Day2, Day3, Day4
-                     , Day5, Day6, Day7, Day8
+                     , Day5, Day6, Day7, Day8, Day9
   -- other-extensions:
   build-depends:       base >=4.13 && <4.14
                      , parsec
