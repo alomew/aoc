@@ -52,3 +52,10 @@ rightToMaybe (Left _) = Nothing
 -- | used to insert toy data into a file
 -- | (intended for use in GHCi)
 readCopyBin = readFile "copybin.txt"
+
+fixPoint :: Eq a => (a -> a) -> a -> a
+fixPoint f x
+  | fx == x = fx
+  | otherwise = fixPoint f fx
+  where
+    fx = f x
