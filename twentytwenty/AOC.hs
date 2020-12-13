@@ -66,3 +66,13 @@ applyN 0 _ x = x
 applyN n f x = applyN (n - 1) f (f x)
 
 cong x n = ((x `mod` n) + n) `mod` n
+
+-- | the extended euclidean algorithm giving gcd and Bezout coeffs
+eea :: Integer -> Integer -> (Integer, Integer, Integer)
+eea a b = go a b 1 0 0 1
+  where
+    go r'' r' s'' s' t'' t' = if r == 0 then (r', s', t') else go r' r s' s t' t
+      where
+        (q, r) = r'' `quotRem` r'
+        s = s'' - q * s'
+        t = t'' - q * t'
