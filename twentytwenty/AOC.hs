@@ -59,3 +59,10 @@ fixPoint f x
   | otherwise = fixPoint f fx
   where
     fx = f x
+
+applyN :: Int -> (a -> a) -> a -> a
+applyN n _ _ | n < 0 = error "Can't apply a generic function negatively many times"
+applyN 0 _ x = x
+applyN n f x = applyN (n - 1) f (f x)
+
+cong x n = ((x `mod` n) + n) `mod` n
