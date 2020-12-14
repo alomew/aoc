@@ -4,6 +4,7 @@ module AOC (module Control.Lens, module Data.Default, module Test.Hspec, module 
 
 import Control.Lens
 import Data.Default
+import Data.List (unfoldr)
 import Test.Hspec
 import Text.Printf
 
@@ -52,6 +53,38 @@ rightToMaybe (Left _) = Nothing
 -- | used to insert toy data into a file
 -- | (intended for use in GHCi)
 readCopyBin = readFile "copybin.txt"
+
+binString ::
+  -- | zeroChars
+  [Char] ->
+  -- | oneChars
+  [Char] ->
+  -- | encoded binary number
+  String ->
+  Int
+binString zs os = decomp . reverse
+  where
+    decomp :: String -> Int
+    decomp = ifoldl (\i n c -> 2 ^ i * f c + n) 0
+    f c
+      | c `elem` zs = 0
+      | c `elem` os = 1
+      | otherwise = error (printf "valid chars are %v: found %c" (zs ++ os) c)
+
+toBinary :: Int -> String
+toBinary x =
+  reverse $
+    unfoldr
+      ( \n ->
+          let (q, r) = n `quotRem` 2
+           in if n <= 0
+                then Nothing
+                else Just (head . show $ r, q)
+      )
+      x
+
+fromBinary :: String -> Int
+fromBinary = binString ['0'] ['1']
 
 fixPoint :: Eq a => (a -> a) -> a -> a
 fixPoint f x

@@ -4,23 +4,6 @@ import AOC
 import qualified Data.Set as S
 import Text.Printf
 
-binString ::
-  -- | zeroChars
-  [Char] ->
-  -- | oneChars
-  [Char] ->
-  -- | encoded binary number
-  String ->
-  Int
-binString zs os = decomp . reverse
-  where
-    decomp :: String -> Int
-    decomp = ifoldl (\i n c -> 2 ^ i * f c + n) 0
-    f c
-      | c `elem` zs = 0
-      | c `elem` os = 1
-      | otherwise = error (printf "valid chars are %v: found %c" (zs ++ os) c)
-
 seatId :: String -> Int
 seatId = binString ['F', 'L'] ['B', 'R']
 
