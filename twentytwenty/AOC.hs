@@ -1,3 +1,4 @@
+{-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE TemplateHaskell #-}
 
 module AOC (module Control.Lens, module Data.Default, module Test.Hspec, module AOC) where
@@ -94,9 +95,11 @@ fixPoint f x
     fx = f x
 
 applyN :: Int -> (a -> a) -> a -> a
-applyN n _ _ | n < 0 = error "Can't apply a generic function negatively many times"
+applyN n _ _ | n < 0 = error "Can't apply a function negatively many times in general"
 applyN 0 _ x = x
-applyN n f x = applyN (n - 1) f (f x)
+applyN n f x = applyN (n - 1) f fd
+  where
+    !fd = f x
 
 cong x n = ((x `mod` n) + n) `mod` n
 
